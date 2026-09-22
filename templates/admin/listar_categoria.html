@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+
+<h1> Lista de categoria</h1>
+
+<div class="col text-end">
+    <a href="{{url_for('cadastrarCategoria')}}" class="btn btn-primary  ">
+        Nova categoria
+    </a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Foto</th>
+            <th scope="col">descrição</th>
+            <th scope="col">Ações</th>
+            
+
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for i in categorias %}
+        <tr>
+            <th scope="row">{{ i.id }}</th>
+            <td>{{ i.id }}</td>
+            <td>{{ i.imagem }}</td>
+
+            <td>{{ i[5]}}</td>
+            <td>{{ i[5]}}</td>
+
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

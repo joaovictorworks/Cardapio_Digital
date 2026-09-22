@@ -1,42 +1,36 @@
-DROP TABLE
-IF
-  EXISTS produtos;
-  DROP TABLE
-  IF
-    EXISTS categoria;
-    DROP TABLE
-    IF
-      EXISTS usuario;
+DROP TABLE IF EXISTS produto;
+DROP TABLE IF EXISTS categoria;
+DROP TABLE IF EXISTS usuario;
 
-      CREATE TABLE categoria(
-        id integer primary key autoincrement
-        , nome varchar(50) not null
-        , descricao text
-        , ativo boolean
-        , imagem blob
-        , img varchar(100)
-      );
 
-      CREATE TABLE produtos(
-        id integer primary key autoincrement
-        , nome varchar(50) not null
-        , preco float
-        , ativo boolean
-        , imagem blob
-        , img varchar(100)
-        , id_categoria int
-        , foreign key (id_categoria) references categoria(id)
-      );
+CREATE TABLE categoria(
+   id integer primary key autoincrement,
+   nome varchar(50) not null,
+   descricao text, 
+   ativo boolean,
+   imagem blob,
+   img varchar(100)
+);
 
-      CREATE TABLE usuario(
-        id integer primary key autoincrement
-        , nome varchar(50) not null
-        , senha varchar(50) not null
-        , ativo boolean
-      );
+CREATE TABLE produto(
+   id integer primary key autoincrement,
+   nome varchar(50) not null,
+   preco float,
+   ativo boolean, 
+   imagem blob,
+   img varchar(100),
+   id_categoria int,
+   foreign key ('id_categoria') references categoria('id')
+);
 
-      insert into
-        categoria(nome, descricao, ativo)
-      values
-        ('vodka', 'Orloff', 'True')
-        , ('Coca Cola', 'Lata', 'True')
+CREATE TABLE usuario (
+    id integer primary key AUTOINCREMENT,
+    nome varchar(50) not null,
+    senha varchar (50) not null,
+    ativo boolean
+
+);
+
+insert into categoria(nome, descricao, ativo)
+values('Vodka','Orloff', 'True'),
+      ('Coca Cola', 'Lata', 'True')  
