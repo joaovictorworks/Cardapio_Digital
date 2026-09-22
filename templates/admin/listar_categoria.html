@@ -28,11 +28,19 @@
         <tr>
             <th scope="row">{{ i.id }}</th>
             <td>{{ i.id }}</td>
-            <td>{{ i.imagem }}</td>
+            <td>{{ i.nome }}</td>
 
-            <td>{{ i[5]}}</td>
-            <td>{{ i[5]}}</td>
+            <td class="text-end">
+                <div class="action-bnts justify-content-end">
+                    <a href="{{ url_fro('editarCategoria', id=i['id'])}}" class="bnt bnt=sm bnt=warnig">
+                        <i class="bi bi-pencil"></i><span
+                        class="d-none d-lg-inline ms-i"> Editar </span>
+                    </a>
+                </div>
 
+            </td>
+
+            <td>{{ i.descrição }}</td>
 
         </tr>
         {% endfor %}
