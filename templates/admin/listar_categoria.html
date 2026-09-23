@@ -13,15 +13,15 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nome</th>
+            <th scope="col">nome</th>
+            <th scope="col">Descrição</th>
             <th scope="col">Foto</th>
-            <th scope="col">descrição</th>
+            <th scope="col"></th>
             <th scope="col">Ações</th>
-            
 
         </tr>
     </thead>
+    
     <tbody>
 
         {% for i in categorias %}
@@ -30,19 +30,18 @@
             <td>{{ i.id }}</td>
             <td>{{ i.nome }}</td>
 
+        <td><img src="data:imagam/\jpeg;base64,
+        {{i [imagem]}}" width="30"></td>
+        
             <td class="text-end">
                 <div class="action-bnts justify-content-end">
-                    <a href="{{ url_fro('editarCategoria', id=i['id'])}}" class="bnt bnt=sm bnt=warnig">
+                    <a href="{{ url_for('editarCategoria', id=i['id'])}}" 
+                    class="bnt bnt=sm bnt=warnig">
                         <i class="bi bi-pencil"></i><span
                         class="d-none d-lg-inline ms-i"> Editar </span>
                     </a>
                 </div>
 
-            </td>
-
-            <td>{{ i.descrição }}</td>
-
-        </tr>
         {% endfor %}
     </tbody>
 </table>

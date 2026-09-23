@@ -40,7 +40,7 @@ def cadastrarCategoria():
        
     return render_template('admin/cadastrar_categoria.html')
 
-@app.route("/editarcategoria/<int:id>", methods=['GET','POST'])
+@app.route("/editarCategoria/<int:id>", methods=['GET','POST'])
 def editarCategoria(id):
     conn = conexao()
     categoria = conn.execute('select * from categoria where id=?', 
@@ -70,5 +70,18 @@ def editarCategoria(id):
 
     return render_template('admin/editar_categoria.html',
                             categoria=categoria )
+
+@app.route("/excluir_Categoria/<int:id>", methods=['GET','POST'])
+def excluirCategoria(id):
+    conn = conexao()
+    categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,)).fetchall()
+    if request.method == 'POST':
+        conn = conexao()
+        Categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,))
+        conn.execute('DELETE FROM categoria WHERE id=?', (id,))
+        conn.commit()
+        conn.close()
+    return redirect(url_for('listarCategoria'))
+
 
 app.run(debug=True)
