@@ -18,7 +18,6 @@
             <th scope="col">Foto</th>
             <th scope="col"></th>
             <th scope="col">Ações</th>
-
         </tr>
     </thead>
     
@@ -27,8 +26,8 @@
         {% for i in categorias %}
         <tr>
             <th scope="row">{{ i.id }}</th>
-            <td>{{ i.id }}</td>
             <td>{{ i.nome }}</td>
+            <td>{{ i.descricao }}</td>
 
         <td><img src="data:imagam/\jpeg;base64,
         {{i [imagem]}}" width="30"></td>

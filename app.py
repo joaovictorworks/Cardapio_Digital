@@ -74,7 +74,7 @@ def editarCategoria(id):
 @app.route("/excluir_Categoria/<int:id>", methods=['GET','POST'])
 def excluirCategoria(id):
     conn = conexao()
-    categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,)).fetchall()
+    categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,)).fetchone()
     if request.method == 'POST':
         conn = conexao()
         Categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,))
