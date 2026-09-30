@@ -2,10 +2,9 @@
 
 {% block content %}
 
-<h1> Lista de categoria</h1>
-
+<h1> Lista de Produtos </h1>
 <div class="col text-end">
-    <a href="#" class="btn btn-primary  ">
+    <a href="{{url_for('cadastrarCategoria')}}" class="btn btn-primary  ">
         Nova categoria
     </a>
 </div>
@@ -13,22 +12,15 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nome</th>
+            <th scope="col">nome</th>
+            <th scope="col">Descrição</th>
             <th scope="col">Foto</th>
-
+            <th scope="col">preco</th>
+            <th scope="col"></th>
+            <th scope="col">Ativo</th>
         </tr>
     </thead>
-    <tbody>
-
-        {% for i in categorias %}
-        <tr>
-            <th scope="row">{{ i[0] }}</th>
-            <td>{{ i[1] }}</td>
-            <td>{{ i[5]}}</td>
-
-        </tr>
-        {% endfor %}
+     
     </tbody>
 </table>
 

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1> Lista de categoria</h1>
+<h1> Lista de categoria </h1>
 
 <div class="col text-end">
     <a href="{{url_for('cadastrarCategoria')}}" class="btn btn-primary  ">
@@ -39,7 +39,15 @@
                         <i class="bi bi-pencil"></i><span
                         class="d-none d-lg-inline ms-i"> Editar </span>
                     </a>
+
+                    <a href="{{ url_for('excluirCategoria', id=i['id'])}}" 
+                    class="bnt bnt=sm bnt=warnig">
+                        <i class="bi bi-pencil"></i><span
+                        class="d-none d-lg-inline ms-i"> Excluir </span>
+                    </a>
                 </div>
+            </td>
+            
 
         {% endfor %}
     </tbody>

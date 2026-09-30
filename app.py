@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, request, url_for
 import sqlite3
 import base64
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 @app.route("/")
 def index():
@@ -19,6 +19,12 @@ def listarCategoria():
     categoria = conn.execute('select * from categoria')
     return render_template('admin/listar_categoria.html',
                            categorias = categoria)
+
+@app.route("/listar_produtos")
+def listarProdutos():
+    conn = conexao()
+    categoria = conn.execute('select * from produto')
+    return render_template('admin/listar_produtos.html',)
 
 @app.route("/cadastrar_categorias", methods=['GET','POST'])
 def cadastrarCategoria():
@@ -81,7 +87,8 @@ def excluirCategoria(id):
         conn.execute('DELETE FROM categoria WHERE id=?', (id,))
         conn.commit()
         conn.close()
-    return redirect(url_for('listarCategoria'))
+        return redirect(url_for('listarCategoria'))
+    return render_template('admin/excluir_Categoria.html',categoria=categoria)
 
 
 app.run(debug=True)
