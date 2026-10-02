@@ -1,15 +1,16 @@
 from flask import Flask, render_template, redirect, request, url_for
 import sqlite3
 import base64
-
 app = Flask(__name__)
+
+
 
 @app.route("/")
 def index():
     return render_template("admin/index.html")
 
 def conexao():
-   conn = sqlite3.connect('database.db')
+   conn=  sqlite3.connect('database.db')
    conn.row_factory = sqlite3.Row
    return conn
 
@@ -20,14 +21,9 @@ def listarCategoria():
     return render_template('admin/listar_categoria.html',
                            categorias = categoria)
 
-@app.route("/listar_produtos")
-def listarProdutos():
-    conn = conexao()
-    categoria = conn.execute('select * from produto')
-    return render_template('admin/listar_produtos.html',)
-
 @app.route("/cadastrar_categorias", methods=['GET','POST'])
-def cadastrarCategoria():
+def cadastrarCategoria():    
+
     if request.method == 'POST':
         nome_categoria = request.form.get('nome_categoria')
         descricao = request.form.get('descricao')
@@ -46,11 +42,14 @@ def cadastrarCategoria():
        
     return render_template('admin/cadastrar_categoria.html')
 
-@app.route("/editarCategoria/<int:id>", methods=['GET','POST'])
+
+
+@app.route("/editarcategoria/<int:id>", methods=['GET','POST'])
 def editarCategoria(id):
     conn = conexao()
-    categoria = conn.execute('select * from categoria where id=?', 
+    categoria = conn.execute('select * from categoria where id=?',
                              (id,)).fetchone()
+    
     if request.method == 'POST':
         nome_categoria = request.form.get('nome_categoria')
         descricao = request.form.get('descricao')
@@ -71,24 +70,32 @@ def editarCategoria(id):
 
             conn.commit()
             conn.close()
-
             return redirect(url_for('listarCategoria'))
 
     return render_template('admin/editar_categoria.html',
                             categoria=categoria )
 
-@app.route("/excluir_Categoria/<int:id>", methods=['GET','POST'])
+
+@app.route("/excluir_categoria/<int:id>", methods=['GET', 'POST'])
 def excluirCategoria(id):
     conn = conexao()
-    categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,)).fetchone()
+    categoria = conn.execute('''SELECT * FROM categoria
+          WHERE id = ?''', (id,)).fetchone()
+    
     if request.method == 'POST':
-        conn = conexao()
-        Categoria = conn.execute('SELECT * FROM categoria WHERE id=?', (id,))
-        conn.execute('DELETE FROM categoria WHERE id=?', (id,))
+        conn.execute('DELETE FROM categoria WHERE id = ?', (id,))
         conn.commit()
         conn.close()
-        return redirect(url_for('listarCategoria'))
-    return render_template('admin/excluir_Categoria.html',categoria=categoria)
+        return redirect(url_for('listarCategoria'))    
+  
+    return render_template('admin/excluir_categoria.html', categoria = categoria )
 
 
-app.run(debug=True)
+@app.route("/listar_produtos")
+def listarProduto():
+    conn = conexao()
+    produto = conn.execute('select * from produto')
+    return render_template('admin/listar_produto.html',
+                           produtos = produto)
+
+app.run(debug=True, port=5005 )
