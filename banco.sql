@@ -33,4 +33,5 @@ CREATE TABLE usuario (
 
 insert into categoria(nome, descricao, ativo)
 values('Vodka','Orloff', 'True'),
-      ('Coca Cola', 'Lata', 'True')  
+      ('Coca Cola', 'Lata', 'True')      
+
