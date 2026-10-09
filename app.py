@@ -169,6 +169,96 @@ def listarProduto():
         ).fetchall()
     return render_template('admin/listar_produto.html', produtos=produtos)
 
+@app.route('/cadastrar_produtos', methods=['GET', 'POST'])
+def cadastrarProduto():
+    with conexao() as conn:
+        categorias = conn.execute(
+            'SELECT id, nome FROM categoria ORDER BY nome'
+        ).fetchall()
+
+        if request.method == 'POST':
+            nome = request.form.get('nome', '').strip()
+            preco_texto = request.form.get('preco', '').strip().replace(',', '.')
+            ativo = request.form.get('ativo', '')
+            id_categoria_texto = request.form.get('id_categoria', '')
+
+            try:
+                preco = float(preco_texto)
+            except ValueError:
+                preco = None
+
+            try:
+                id_categoria = int(id_categoria_texto)
+            except ValueError:
+                id_categoria = None
+
+            categoria_valida = (
+                conn.execute(
+                    'SELECT id FROM categoria WHERE id = ?', (id_categoria,)
+                ).fetchone()
+                if id_categoria is not None
+                else None
+            )
+
+            if not nome:
+                erro = 'Informe o nome do produto.'
+            elif preco is None or not math.isfinite(preco) or preco < 0:
+                erro = 'Informe um preço válido.'
+            elif ativo not in ('True', 'False'):
+                erro = 'Selecione um status válido.'
+            elif categoria_valida is None:
+                erro = 'Selecione uma categoria válida.'
+            else:
+                imagem = request.files.get('imagem')
+                try:
+                    caminho_imagem = salvar_imagem(imagem, 'produto')
+                except ValueError as erro:
+                    flash(str(erro), 'danger')
+                    return render_template(
+                        'admin/cadastrar_produto.html',
+                        categorias=categorias,
+                    )
+
+                conn.execute(
+                    '''INSERT INTO produto (nome, preco, ativo, img, id_categoria)
+                       VALUES (?, ?, ?, ?, ?)''',
+                    (nome, preco, ativo, caminho_imagem, id_categoria),
+                )
+                conn.commit()
+                flash('Produto cadastrado com sucesso.', 'success')
+                return redirect(url_for('listarProduto'))
+
+            return render_template(
+                'admin/cadastrar_produto.html',
+                categorias=categorias,
+                erro=erro,
+            )
+
+    return render_template(
+        'admin/cadastrar_produto.html',
+        categorias=categorias,
+    )
+
+
+@app.route('/excluir_produto/<int:id>', methods=['GET', 'POST'])
+def excluirProduto(id):
+    with conexao() as conn:
+        produto = conn.execute('SELECT * FROM produto WHERE id = ?', (id,)).fetchone()
+
+    if produto is None:
+        flash('Produto não encontrada.', 'danger')
+        return redirect(url_for('listarProduto'))
+
+    if request.method == 'POST':
+        with conexao() as conn:
+            conn.execute('DELETE FROM Produto WHERE id = ?', (id,))
+            conn.commit()
+        excluir_imagem(produto['img'])
+        flash(' Produto excluída com sucesso. ', 'success')
+        return redirect(url_for('listarProduto'))
+
+    return render_template('admin/excluir_produto.html', produto=produto)
+
 
 @app.route('/cadastrar_produtos', methods=['GET', 'POST'])
 def cadastrarProduto():
