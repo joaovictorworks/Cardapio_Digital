@@ -1,0 +1,65 @@
+{% extends 'admin/base.html' %}
+{% block title %}Cadastrar Produto{% endblock %}
+{% block page_title %}Cadastrar Produto{% endblock %}
+{% block breadcrumb %}Novo produto{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-8 col-lg-10">
+    <div class="card card-primary card-outline">
+      <div class="card-header"><h3 class="card-title">Dados do produto</h3></div>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="card-body">
+          {% if erro %}
+          <div class="alert alert-danger" role="alert">{{ erro }}</div>
+          {% endif %}
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome do produto</label>
+            <input type="text" class="form-control" id="nome" name="nome"
+                   value="{{ request.form.get('nome', '') }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="preco" class="form-label">Preço</label>
+            <input type="number" class="form-control" id="preco" name="preco"
+                   min="0" step="0.01" value="{{ request.form.get('preco', '') }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="id_categoria" class="form-label">Categoria</label>
+            <select class="form-select" id="id_categoria" name="id_categoria"
+                    required {% if not categorias %}disabled{% endif %}>
+              <option value="">Selecione uma categoria</option>
+              {% for categoria in categorias %}
+              <option value="{{ categoria.id }}"
+                      {% if request.form.get('id_categoria') == categoria.id|string %}selected{% endif %}>
+                {{ categoria.nome }}
+              </option>
+              {% endfor %}
+            </select>
+            {% if not categorias %}
+            <div class="form-text">Cadastre uma categoria antes de cadastrar produtos.</div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="ativo" class="form-label">Status</label>
+            <select class="form-select" id="ativo" name="ativo" required>
+              <option value="True" {% if request.form.get('ativo', 'True') == 'True' %}selected{% endif %}>Ativo</option>
+              <option value="False" {% if request.form.get('ativo') == 'False' %}selected{% endif %}>Inativo</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="imagem" class="form-label">Imagem</label>
+            <input type="file" class="form-control" id="imagem" name="imagem"
+                   accept="image/png,image/jpeg,image/gif,image/webp">
+          </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a href="{{ url_for('listarProduto') }}" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>Cadastrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
