@@ -259,77 +259,56 @@ def excluirProduto(id):
 
     return render_template('admin/excluir_produto.html', produto=produto)
 
-
-@app.route('/cadastrar_produtos', methods=['GET', 'POST'])
-def cadastrarProduto():
+@app.route('/site/viewer_categoria')
+def viewer_categoria():
     with conexao() as conn:
-        categorias = conn.execute(
-            'SELECT id, nome FROM categoria ORDER BY nome'
+        linhas = conn.execute(
+            '''
+            SELECT
+                c.id AS categoria_id,
+                c.nome AS categoria_nome,
+                c.descricao AS categoria_descricao,
+                c.img AS categoria_img,
+                p.id AS produto_id,
+                p.nome AS produto_nome,
+                p.preco AS produto_preco,
+                p.img AS produto_img
+            FROM categoria AS c
+            LEFT JOIN produto AS p
+                ON p.id_categoria = c.id
+                AND p.ativo = 'True'
+            WHERE c.ativo = 'True'
+            ORDER BY c.nome, p.nome
+            '''
         ).fetchall()
 
-        if request.method == 'POST':
-            nome = request.form.get('nome', '').strip()
-            preco_texto = request.form.get('preco', '').strip().replace(',', '.')
-            ativo = request.form.get('ativo', '')
-            id_categoria_texto = request.form.get('id_categoria', '')
+    categorias_por_id = {}
 
-            try:
-                preco = float(preco_texto)
-            except ValueError:
-                preco = None
+    for linha in linhas:
+        categoria_id = linha['categoria_id']
 
-            try:
-                id_categoria = int(id_categoria_texto)
-            except ValueError:
-                id_categoria = None
+        if categoria_id not in categorias_por_id:
+            categorias_por_id[categoria_id] = {
+                'nome': linha['categoria_nome'],
+                'descricao': linha['categoria_descricao'],
+                'img': linha['categoria_img'],
+                'produtos': [],
+            }
 
-            categoria_valida = (
-                conn.execute(
-                    'SELECT id FROM categoria WHERE id = ?', (id_categoria,)
-                ).fetchone()
-                if id_categoria is not None
-                else None
-            )
-
-            if not nome:
-                erro = 'Informe o nome do produto.'
-            elif preco is None or not math.isfinite(preco) or preco < 0:
-                erro = 'Informe um preço válido.'
-            elif ativo not in ('True', 'False'):
-                erro = 'Selecione um status válido.'
-            elif categoria_valida is None:
-                erro = 'Selecione uma categoria válida.'
-            else:
-                imagem = request.files.get('imagem')
-                try:
-                    caminho_imagem = salvar_imagem(imagem, 'produto')
-                except ValueError as erro:
-                    flash(str(erro), 'danger')
-                    return render_template(
-                        'admin/cadastrar_produto.html',
-                        categorias=categorias,
-                    )
-
-                conn.execute(
-                    '''INSERT INTO produto (nome, preco, ativo, img, id_categoria)
-                       VALUES (?, ?, ?, ?, ?)''',
-                    (nome, preco, ativo, caminho_imagem, id_categoria),
-                )
-                conn.commit()
-                flash('Produto cadastrado com sucesso.', 'success')
-                return redirect(url_for('listarProduto'))
-
-            return render_template(
-                'admin/cadastrar_produto.html',
-                categorias=categorias,
-                erro=erro,
-            )
+        if linha['produto_id'] is not None:
+            categorias_por_id[categoria_id]['produtos'].append({
+                'nome': linha['produto_nome'],
+                'preco': linha['produto_preco'],
+                'img': linha['produto_img'],
+            })
 
     return render_template(
-        'admin/cadastrar_produto.html',
-        categorias=categorias,
+        'site/viewer_categoria.html',
+        categorias=list(categorias_por_id.values()),
     )
-
+@app.route('/site/viewer_produto', methods=['GET'])
+def viewer_produto():
+    return render_template('site/viewer_produto.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5005)

@@ -1,0 +1,65 @@
+{<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Produtos</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/dist/css/adminlte.min.css') }}">
+</head>
+<body>
+  <main class="container py-4">
+    <h1 class="mb-4">Nossas categorias</h1>
+
+    <div class="row g-4">
+      {% for categoria in categorias %}
+      <div class="col-12">
+        <section class="card">
+          <div class="card-header">
+            <h2 class="h4 mb-0">{{ categoria.nome }}</h2>
+            {% if categoria.descricao %}
+            <p class="mb-0 mt-2">{{ categoria.descricao }}</p>
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            {% if categoria.produtos %}
+            <div class="row g-3">
+              {% for produto in categoria.produtos %}
+              <div class="col-12 col-sm-6 col-lg-4">
+                <article class="card h-100">
+                  {% if produto.img %}
+                  <img
+                    src="{{ url_for('static', filename=produto.img) }}"
+                    class="card-img-top"
+                    alt="{{ produto.nome }}"
+                    style="height: 200px; object-fit: cover;">
+                  {% endif %}
+
+                  <div class="card-body">
+                    <h3 class="h5 card-title">{{ produto.nome }}</h3>
+                    {% if produto.preco is not none %}
+                    <p class="card-text">
+                      R$ {{ '%.2f'|format(produto.preco)|replace('.', ',') }}
+                    </p>
+                    {% endif %}
+                  </div>
+                </article>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-secondary mb-0">
+              Ainda não há produtos nesta categoria.
+            </p>
+            {% endif %}
+          </div>
+        </section>
+      </div>
+      {% else %}
+      <p>Nenhuma categoria disponível no momento.</p>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+</html>
