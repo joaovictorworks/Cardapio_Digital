@@ -1,4 +1,4 @@
-{<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
@@ -6,40 +6,90 @@
   <title>Produtos</title>
   <link rel="stylesheet"
         href="{{ url_for('static', filename='css/dist/css/adminlte.min.css') }}">
+  <style>
+    .category-card summary {
+      cursor: pointer;
+      list-style: none;
+      min-height: 5rem;
+    }
+
+    .category-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .category-card summary::after {
+      content: "+";
+      margin-left: auto;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .category-card[open] summary::after {
+      content: "−";
+    }
+
+    .category-image {
+      width: 3.5rem;
+      height: 3.5rem;
+      flex: 0 0 3.5rem;
+      object-fit: cover;
+      border-radius: .5rem;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+  </style>
 </head>
 <body>
+  <nav class="navbar navbar-expand bg-light border-bottom">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('viewer_categoria') }}">Catálogo</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('index') }}">
+        Área administrativa
+      </a>
+    </div>
+  </nav>
   <main class="container py-4">
     <h1 class="mb-4">Nossas categorias</h1>
 
     <div class="row g-4">
       {% for categoria in categorias %}
-      <div class="col-12">
-        <section class="card">
-          <div class="card-header">
-            <h2 class="h4 mb-0">{{ categoria.nome }}</h2>
-            {% if categoria.descricao %}
-            <p class="mb-0 mt-2">{{ categoria.descricao }}</p>
+      <div class="col-12 col-md-6 col-xl-4">
+        <details class="card category-card h-100">
+          <summary class="card-header d-flex align-items-center gap-3">
+            {% if categoria.img %}
+            <img
+              src="{{ url_for('static', filename=categoria.img) }}"
+              class="category-image"
+              alt="Imagem da categoria {{ categoria.nome }}">
             {% endif %}
-          </div>
+            <span>
+              <span class="d-block h5 mb-0">{{ categoria.nome }}</span>
+              {% if categoria.descricao %}
+              <small class="text-secondary">{{ categoria.descricao }}</small>
+              {% endif %}
+            </span>
+          </summary>
 
           <div class="card-body">
             {% if categoria.produtos %}
             <div class="row g-3">
               {% for produto in categoria.produtos %}
-              <div class="col-12 col-sm-6 col-lg-4">
-                <article class="card h-100">
+              <div class="col-12 col-sm-6">
+                <article class="card h-100 mb-0">
                   {% if produto.img %}
                   <img
                     src="{{ url_for('static', filename=produto.img) }}"
-                    class="card-img-top"
-                    alt="{{ produto.nome }}"
-                    style="height: 200px; object-fit: cover;">
+                    class="card-img-top product-image"
+                    alt="{{ produto.nome }}">
                   {% endif %}
-
                   <div class="card-body">
-                    <h3 class="h5 card-title">{{ produto.nome }}</h3>
+                    <h2 class="h6 card-title">{{ produto.nome }}</h2>
                     {% if produto.preco is not none %}
-                    <p class="card-text">
+                    <p class="card-text mb-0">
                       R$ {{ '%.2f'|format(produto.preco)|replace('.', ',') }}
                     </p>
                     {% endif %}
@@ -54,10 +104,10 @@
             </p>
             {% endif %}
           </div>
-        </section>
+        </details>
       </div>
       {% else %}
-      <p>Nenhuma categoria disponível no momento.</p>
+      <p class="text-secondary">Nenhuma categoria disponível no momento.</p>
       {% endfor %}
     </div>
   </main>

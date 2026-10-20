@@ -4,6 +4,7 @@ import sqlite3
 import uuid
 
 from flask import Flask, flash, redirect, render_template, request, url_for
+from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -259,6 +260,7 @@ def excluirProduto(id):
 
     return render_template('admin/excluir_produto.html', produto=produto)
 
+@app.route('/catalogo')
 @app.route('/site/viewer_categoria')
 def viewer_categoria():
     with conexao() as conn:
@@ -308,7 +310,105 @@ def viewer_categoria():
     )
 @app.route('/site/viewer_produto', methods=['GET'])
 def viewer_produto():
-    return render_template('site/viewer_produto.html')
+    return redirect(url_for('viewer_categoria'))
+
+@app.route('/cadastrar_usuarios', methods=['GET', 'POST'])
+def cadastrarUsuario():
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        senha = request.form.get('senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        ativo = request.form.get('ativo', 'False')
+
+        if not nome or not senha:
+            flash('Informe o nome e a senha do usuário.', 'danger')
+            return render_template('admin/cadastrar_usuario.html')
+
+        if senha != confirmar_senha:
+            flash('As senhas não conferem.', 'danger')
+            return render_template('admin/cadastrar_usuario.html')
+
+        with conexao() as conn:
+            if conn.execute('SELECT 1 FROM usuario WHERE nome = ?', (nome,)).fetchone():
+                flash('Já existe um usuário com esse nome.', 'danger')
+                return render_template('admin/cadastrar_usuario.html')
+
+            conn.execute(
+                'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
+                (nome, generate_password_hash(senha), ativo),
+            )
+            conn.commit()
+
+        flash('Usuário cadastrado com sucesso.', 'success')
+        return redirect(url_for('listarUsuario'))
+
+    return render_template('admin/cadastrar_usuario.html')
+
+
+@app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
+def editarUsuario(id):
+    with conexao() as conn:
+        usuario = conn.execute('SELECT * FROM usuario WHERE id = ?', (id,)).fetchone()
+
+    if usuario is None:
+        flash('Usuário não encontrado.', 'danger')
+        return redirect(url_for('listarUsuario'))
+
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        senha = request.form.get('senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        ativo = request.form.get('ativo', 'False')
+
+        if not nome:
+            flash('Informe o nome do usuário.', 'danger')
+            return render_template('admin/editar_usuario.html', usuario=usuario)
+
+        if senha != confirmar_senha:
+            flash('As senhas não conferem.', 'danger')
+            return render_template('admin/editar_usuario.html', usuario=usuario)
+
+        with conexao() as conn:
+            if conn.execute('SELECT 1 FROM usuario WHERE nome = ? AND id <> ?', (nome, id)).fetchone():
+                flash('Já existe um usuário com esse nome.', 'danger')
+                return render_template('admin/editar_usuario.html', usuario=usuario)
+
+            if senha:
+                conn.execute(
+                    'UPDATE usuario SET nome = ?, senha = ?, ativo = ? WHERE id = ?',
+                    (nome, generate_password_hash(senha), ativo, id),
+                )
+            else:
+                conn.execute(
+                    'UPDATE usuario SET nome = ?, ativo = ? WHERE id = ?',
+                    (nome, ativo, id),
+                )
+            conn.commit()
+
+        flash('Usuário atualizado com sucesso.', 'success')
+        return redirect(url_for('listarUsuario'))
+
+    return render_template('admin/editar_usuario.html', usuario=usuario)
+
+
+@app.route('/excluir_usuario/<int:id>', methods=['GET', 'POST'])
+def excluirUsuario(id):
+    with conexao() as conn:
+        usuario = conn.execute('SELECT id, nome FROM usuario WHERE id = ?', (id,)).fetchone()
+
+    if usuario is None:
+        flash('Usuário não encontrado.', 'danger')
+        return redirect(url_for('listarUsuario'))
+
+    if request.method == 'POST':
+        with conexao() as conn:
+            conn.execute('DELETE FROM usuario WHERE id = ?', (id,))
+            conn.commit()
+        flash('Usuário excluído com sucesso.', 'success')
+        return redirect(url_for('listarUsuario'))
+
+    return render_template('admin/excluir_usuario.html', usuario=usuario)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
