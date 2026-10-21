@@ -3,32 +3,19 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>AdminLTE 4 | Registtrar </title>
+    <title> Meu Sistema </title>
 
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-    <!--end::Accessibility Meta Tags-->
-
-    <!--begin::Primary Meta Tags-->
-    <meta name="title" content="AdminLTE 4 | Register Page" />
-    <meta name="author" content="ColorlibHQ" />
-    <meta
-      name="description"
-      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS. Fully accessible with WCAG 2.1 AA compliance."
-    />
-    <meta
-      name="keywords"
-      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel, WCAG compliant"
-    />
-    <!--end::Primary Meta Tags-->
+    
 
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
     <meta name="supported-color-schemes" content="light dark" />
-    <link rel="preload" href="../css/adminlte.css" as="style" />
+    <link rel="preload" href="/templates/admin/css/adminlte.css" as="style" />
     <!--end::Accessibility Features-->
 
     <!--begin::Fonts-->
@@ -59,7 +46,7 @@
     <!--end::Third Party Plugin(Bootstrap Icons)-->
 
     <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="../css/adminlte.css" />
+    <link rel="stylesheet" href="/templates/admin/css/adminlte.css" />
     <!--end::Required Plugin(AdminLTE)-->
   </head>
   <!--end::Head-->
@@ -67,14 +54,14 @@
   <body class="register-page bg-body-secondary">
     <div class="register-box">
       <div class="register-logo">
-        <a href="../index.html"><b>Admin</b>LTE</a>
+        <a href="/templates/admin/index.html"><b>Admin</b>LTE</a>
       </div>
       <!-- /.register-logo -->
       <div class="card">
         <div class="card-body register-card-body">
           <p class="register-box-msg">Registrar um novo usuário</p>
 
-          <form action="../index3.html" method="post">
+          <form action="/templates/admin/index3.html" method="post">
             <div class="input-group mb-3">
               <input type="text" class="form-control" placeholder="Nome Completo" />
               <div class="input-group-text">
@@ -99,7 +86,7 @@
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
                   <label class="form-check-label" for="flexCheckDefault">
-                    I agree to the <a href="#">terms</a>
+                    eu aceito os <a href="#">termos de serviços</a>
                   </label>
                 </div>
               </div>
@@ -119,11 +106,11 @@
             <a href="#" class="btn btn-danger">
               <i class="bi bi-google me-2"></i> Refigistrar com Google
             </a>
-          </div>
+          </div> 
           <!-- /.social-auth-links -->
 
           <p class="mb-0">
-            <a href="login.html" class="text-center"> Já tenho uma conta </a>
+            <a href="/templates/admin/login.html" class="text-center"> Já tenho uma conta </a>
           </p>
         </div>
         <!-- /.register-card-body -->
@@ -147,7 +134,7 @@
       crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="../js/adminlte.js"></script>
+    <script src="/templates/admin/static/css/dist/js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
       const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';

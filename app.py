@@ -441,6 +441,5 @@ def excluirUsuario(id):
 
     return render_template('admin/excluir_usuario.html', usuario=usuario)
 
-
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
