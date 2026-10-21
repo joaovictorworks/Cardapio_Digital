@@ -31,10 +31,13 @@
           </a>
         </li>
         <li class="nav-item d-none d-md-block">
-          <a href="{{ url_for('index') }}" class="nav-link">Início</a>
+          <a href="{{ url_for('index') }}" class="nav-link" style="color: green;"">Início</a>
         </li>
+      <li>
+        <p class="nav-link">/</p>
+      </li>
         <li class="nav-item d-none d-md-block">
-          <a href="{{ url_for('viewer_categoria') }}" class="nav-link">Site</a>
+          <a href="{{ url_for('viewer_categoria') }}" class="nav-link" style="color: blue;">Site</a>
         </li>
       </ul>
       <ul class="navbar-nav ms-auto">
@@ -74,6 +77,12 @@
                 <a href="{{ url_for('listarProduto') }}"
                    class="nav-link {% if request.endpoint == 'listarProduto' %}active{% endif %}">
                   <i class="nav-icon bi bi-box"></i><p>Produtos</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('listarUsuarios') }}"
+                   class="nav-link {% if request.endpoint == 'listarUsuarios' %}active{% endif %}">
+                  <i class="nav-icon bi bi-person-circle"></i><p>Usuarios</p>
                 </a>
               </li>
             </ul>

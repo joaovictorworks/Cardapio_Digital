@@ -27,7 +27,6 @@ def extensao_permitida(nome_arquivo):
 
 
 def salvar_imagem(arquivo, prefixo='imagem'):
-    """Salva a imagem em static/uploads e retorna o caminho relativo usado pelo url_for('static')."""
     if not arquivo or not arquivo.filename:
         return None
 
@@ -42,13 +41,73 @@ def salvar_imagem(arquivo, prefixo='imagem'):
 
 
 def excluir_imagem(caminho):
-    """Remove apenas arquivos armazenados em static/uploads."""
     if not caminho or not caminho.startswith('uploads/'):
         return
     arquivo = Path(app.root_path) / 'static' / caminho
     if arquivo.exists() and arquivo.is_file():
         arquivo.unlink()
 
+@app.route('/login_usuario', methods=['GET'])
+def loginUsuario():
+    return render_template('admin/login_usuario.html')
+    
+    if not nome or not senha:
+            flash('Informe o nome e a senha do usuário.', 'danger')
+            return render_template('admin/login_usuario.html')
+
+    if senha != confirmar_senha:
+            flash('As senhas não conferem.', 'danger')
+            return render_template('admin/login_usuario.html')
+
+    with conexao() as conn:
+            if conn.execute('SELECT 1 FROM usuario WHERE nome = ?', (nome,)).fetchone():
+                flash('Já existe um usuário com esse nome.', 'danger')
+                return render_template('admin/login_usuario.html')
+
+            conn.execute(
+                'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
+                (nome, generate_password_hash(senha), ativo),
+            )
+            conn.commit()
+
+    flash('Usuário cadastrado com sucesso.', 'success')
+
+    return redirect(url_for('listar_usuario'))
+    return render_template('admin/login_usuario.html')
+    return render_template('admin/cadastrar_usuario.html')
+
+@app.route('/cadastrar_usuario', methods=['GET', 'POST'])
+def cadastrarUsuario():
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        senha = request.form.get('senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        ativo = request.form.get('ativo', 'False')
+
+        if not nome or not senha:
+            flash('Informe o nome e a senha do usuário.', 'danger')
+            return render_template('admin/cadastrar_usuario.html')
+
+        if senha != confirmar_senha:
+            flash('As senhas não conferem.', 'danger')
+            return render_template('admin/cadastrar_usuario.html')
+
+        with conexao() as conn:
+            if conn.execute('SELECT 1 FROM usuario WHERE nome = ?', (nome,)).fetchone():
+                flash('Já existe um usuário com esse nome.', 'danger')
+                return render_template('admin/cadastrar_usuario.html')
+
+            conn.execute(
+                'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
+                (nome, generate_password_hash(senha), ativo),
+            )
+            conn.commit()
+
+        flash('Usuário cadastrado com sucesso.', 'success')
+
+        return redirect(url_for('listarUsuarios'))
+
+    return render_template('admin/cadastrar_usuario.html')
 
 @app.route('/')
 def index():
@@ -252,10 +311,10 @@ def excluirProduto(id):
 
     if request.method == 'POST':
         with conexao() as conn:
-            conn.execute('DELETE FROM Produto WHERE id = ?', (id,))
+            conn.execute('DELETE FROM produto WHERE id = ?', (id,))
             conn.commit()
         excluir_imagem(produto['img'])
-        flash(' Produto excluída com sucesso. ', 'success')
+        flash('Produto excluída com sucesso.', 'success')
         return redirect(url_for('listarProduto'))
 
     return render_template('admin/excluir_produto.html', produto=produto)
@@ -312,38 +371,11 @@ def viewer_categoria():
 def viewer_produto():
     return redirect(url_for('viewer_categoria'))
 
-@app.route('/cadastrar_usuarios', methods=['GET', 'POST'])
-def cadastrarUsuario():
-    if request.method == 'POST':
-        nome = request.form.get('nome', '').strip()
-        senha = request.form.get('senha')
-        confirmar_senha = request.form.get('confirmar_senha')
-        ativo = request.form.get('ativo', 'False')
-
-        if not nome or not senha:
-            flash('Informe o nome e a senha do usuário.', 'danger')
-            return render_template('admin/cadastrar_usuario.html')
-
-        if senha != confirmar_senha:
-            flash('As senhas não conferem.', 'danger')
-            return render_template('admin/cadastrar_usuario.html')
-
-        with conexao() as conn:
-            if conn.execute('SELECT 1 FROM usuario WHERE nome = ?', (nome,)).fetchone():
-                flash('Já existe um usuário com esse nome.', 'danger')
-                return render_template('admin/cadastrar_usuario.html')
-
-            conn.execute(
-                'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
-                (nome, generate_password_hash(senha), ativo),
-            )
-            conn.commit()
-
-        flash('Usuário cadastrado com sucesso.', 'success')
-        return redirect(url_for('listarUsuario'))
-
-    return render_template('admin/cadastrar_usuario.html')
-
+@app.route('/listar_usuarios')
+def listarUsuarios():
+    with conexao() as conn:
+        usuarios = conn.execute('SELECT * FROM usuario ORDER BY id DESC').fetchall()
+    return render_template('admin/listar_usuario.html', usuarios=usuarios)
 
 @app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
 def editarUsuario(id):
