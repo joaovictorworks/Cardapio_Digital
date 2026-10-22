@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+{% block title %}QR Code do cardápio{% endblock %}
+{% block page_title %}QR Code do cardápio{% endblock %}
+{% block breadcrumb %}QR Code{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header"><h2 class="h5 mb-0">Compartilhe seu cardápio</h2></div>
+      <div class="card-body text-center">
+        <p>Os clientes podem apontar a câmera do celular para este código e fazer o pedido.</p>
+        <div id="qrcode" class="d-flex justify-content-center my-4"
+             role="img" aria-label="QR Code do cardápio"></div>
+        <a href="{{ catalogo_url }}" target="_blank" rel="noopener">{{ catalogo_url }}</a>
+      </div>
+      <div class="card-footer text-end">
+        <button class="btn btn-primary" type="button" onclick="window.print()">
+          <i class="bi bi-printer me-1"></i>Imprimir QR Code
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  if (window.QRCode) {
+    new QRCode(document.getElementById('qrcode'), {
+      text: {{ catalogo_url|tojson }},
+      width: 240,
+      height: 240,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  } else {
+    document.getElementById('qrcode').textContent =
+      'Não foi possível carregar o gerador do QR Code. Use o link do cardápio acima.';
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'admin/base.html' %}
+{% block title %}Pedidos{% endblock %}
+{% block page_title %}Pedidos{% endblock %}
+{% block breadcrumb %}Pedidos{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title mb-0">Pedidos recebidos</h3>
+  </div>
+  <div class="card-body">
+    {% for pedido in pedidos %}
+    <article class="card mb-3 {% if pedido.status == 'novo' %}border-danger{% endif %}">
+      <div class="card-header d-flex flex-wrap align-items-center gap-2">
+        <h2 class="h5 mb-0">Pedido #{{ pedido.id }} · {{ pedido.cliente_nome }}</h2>
+        <span class="badge {% if pedido.status == 'novo' %}text-bg-danger{% else %}text-bg-secondary{% endif %}">
+          {{ status_pedido[pedido.status] }}
+        </span>
+        <time class="ms-auto text-secondary" datetime="{{ pedido.criado_em }}">
+          {{ pedido.criado_em }}
+        </time>
+      </div>
+      <div class="card-body">
+        {% if pedido.cliente_telefone %}
+        <p class="mb-2"><strong>Telefone:</strong> {{ pedido.cliente_telefone }}</p>
+        {% endif %}
+        <ul class="mb-2">
+          {% for item in itens_por_pedido.get(pedido.id, []) %}
+          <li>
+            {{ item.quantidade }} × {{ item.produto_nome }}
+            — R$ {{ '%.2f'|format(item.preco_unitario_centavos / 100)|replace('.', ',') }}
+            (R$ {{ '%.2f'|format(item.subtotal_centavos / 100)|replace('.', ',') }})
+          </li>
+          {% endfor %}
+        </ul>
+        {% if pedido.observacoes %}
+        <p><strong>Observações:</strong> {{ pedido.observacoes }}</p>
+        {% endif %}
+        <p class="h5">
+          Total: R$ {{ '%.2f'|format(pedido.total_centavos / 100)|replace('.', ',') }}
+        </p>
+        <form action="{{ url_for('orders.atualizar_status', pedido_id=pedido.id) }}"
+              method="post" class="d-flex gap-2">
+          <label class="visually-hidden" for="status-{{ pedido.id }}">Status do pedido</label>
+          <select class="form-select" id="status-{{ pedido.id }}" name="status">
+            {% for chave, rotulo in status_pedido.items() %}
+            <option value="{{ chave }}" {% if pedido.status == chave %}selected{% endif %}>
+              {{ rotulo }}
+            </option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-primary text-nowrap" type="submit">Atualizar</button>
+        </form>
+      </div>
+    </article>
+    {% else %}
+    <p class="text-secondary mb-0">Ainda não há pedidos.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

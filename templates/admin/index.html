@@ -19,5 +19,33 @@
       <a href="{{ url_for('listarProduto') }}" class="small-box-footer link-light">Acessar <i class="bi bi-arrow-right-circle"></i></a>
     </div>
   </div>
+  <div class="col-md-6 col-xl-4">
+    <div class="small-box text-bg-warning">
+      <div class="inner"><h3>Usuarios</h3><p>Consulte os usuarios cadastrados</p></div>
+      <i class="small-box-icon bi bi-people"></i>
+      <a href="{{ url_for('listarUsuarios') }}" class="small-box-footer link-light">Acessar <i class="bi bi-arrow-right-circle"></i></a>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <div class="small-box text-bg-danger">
+      <div class="inner">
+        <h3>{{ total_pedidos_novos }}</h3>
+        <p>Pedidos aguardando atendimento</p>
+      </div>
+      <i class="small-box-icon bi bi-receipt"></i>
+      <a href="{{ url_for('orders.listar_pedidos') }}" class="small-box-footer link-light">
+        Ver pedidos <i class="bi bi-arrow-right-circle"></i>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <div class="small-box text-bg-info">
+      <div class="inner"><h3>QR</h3><p>Compartilhe o cardápio com seus clientes</p></div>
+      <i class="small-box-icon bi bi-qr-code"></i>
+      <a href="{{ url_for('orders.qrcode_cardapio') }}" class="small-box-footer link-light">
+        Abrir QR Code <i class="bi bi-arrow-right-circle"></i>
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}

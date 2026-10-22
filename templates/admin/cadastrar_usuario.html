@@ -8,14 +8,12 @@
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     
 
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
-    <meta name="supported-color-schemes" content="light dark" />
-    <link rel="preload" href="/templates/admin/css/adminlte.css" as="style" />
+    <link rel="preload" href="{{ url_for('static', filename='css/dist/css/adminlte.css') }}" as="style" />
     <!--end::Accessibility Features-->
 
     <!--begin::Fonts-->
@@ -46,7 +44,8 @@
     <!--end::Third Party Plugin(Bootstrap Icons)-->
 
     <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="/templates/admin/css/adminlte.css" />
+    <link rel="stylesheet"
+     href="{{ url_for('static', filename='css/dist/css/adminlte.css') }}" />
     <!--end::Required Plugin(AdminLTE)-->
   </head>
   <!--end::Head-->
@@ -61,21 +60,27 @@
         <div class="card-body register-card-body">
           <p class="register-box-msg">Registrar um novo usuário</p>
 
-          <form action="/templates/admin/index3.html" method="post">
+          {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+              <div class="alert alert-{{ categoria }}" role="alert">{{ mensagem }}</div>
+            {% endfor %}
+          {% endwith %}
+
+          <form action="{{ url_for('cadastrarUsuario') }}" method="post">
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Nome Completo" />
+              <input type="text" class="form-control" name="nome" placeholder="Nome de usuário" autocomplete="username" required />
               <div class="input-group-text">
                 <span class="bi bi-person"></span>
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="email" class="form-control" placeholder="Email" />
+              <input type="password" class="form-control" name="senha" placeholder="Senha" autocomplete="new-password" required />
               <div class="input-group-text">
-                <span class="bi bi-envelope"></span>
+                <span class="bi bi-lock-fill"></span>
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="password" class="form-control" placeholder="Password" />
+              <input type="password" class="form-control" name="confirmar_senha" placeholder="Confirme a senha" autocomplete="new-password" required />
               <div class="input-group-text">
                 <span class="bi bi-lock-fill"></span>
               </div>
@@ -101,16 +106,8 @@
             <!--end::Row-->
           </form>
 
-          <div class="social-auth-links text-center mb-3 d-grid gap-2">
-          
-            <a href="#" class="btn btn-danger">
-              <i class="bi bi-google me-2"></i> Refigistrar com Google
-            </a>
-          </div> 
-          <!-- /.social-auth-links -->
-
           <p class="mb-0">
-            <a href="/templates/admin/login.html" class="text-center"> Já tenho uma conta </a>
+            <a href="{{ url_for('loginUsuario') }}" class="text-center"> Já tenho uma conta </a>
           </p>
         </div>
         <!-- /.register-card-body -->
@@ -134,7 +131,7 @@
       crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="/templates/admin/static/css/dist/js/adminlte.js"></script>
+    <script src="{{ url_for('static', filename='css/dist/js/adminlte.js') }}"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
       const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';

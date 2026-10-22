@@ -1,25 +1,29 @@
 import math
+import os
 from pathlib import Path
-import sqlite3
+import secrets
 import uuid
 
-from flask import Flask, flash, redirect, render_template, request, url_for
-from werkzeug.security import generate_password_hash
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
+from database import abrir_banco
+from orders import orders
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-secret-key'
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY') or secrets.token_hex(32)
+app.config['DATABASE'] = Path(app.root_path) / 'database.db'
 app.config['UPLOAD_FOLDER'] = Path(app.root_path) / 'static' / 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+app.register_blueprint(orders)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'].mkdir(parents=True, exist_ok=True)
 
 
 def conexao():
-    conn = sqlite3.connect(Path(app.root_path) / 'database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+    return abrir_banco(app.config['DATABASE'])
 
 
 def extensao_permitida(nome_arquivo):
@@ -47,42 +51,80 @@ def excluir_imagem(caminho):
     if arquivo.exists() and arquivo.is_file():
         arquivo.unlink()
 
-@app.route('/login_usuario', methods=['GET'])
+@app.route('/login_usuario', methods=['GET', 'POST'])
 def loginUsuario():
-    return render_template('admin/login_usuario.html')
-    
-    if not nome or not senha:
-            flash('Informe o nome e a senha do usuário.', 'danger')
-            return render_template('admin/login_usuario.html')
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        senha = request.form.get('senha', '')
 
-    if senha != confirmar_senha:
-            flash('As senhas não conferem.', 'danger')
-            return render_template('admin/login_usuario.html')
+        with conexao() as conn:
+            usuario = conn.execute(
+                'SELECT id, nome, senha, ativo FROM usuario WHERE nome = ?',
+                (nome,),
+            ).fetchone()
 
+        usuario_ativo = usuario and str(usuario['ativo']).strip().lower() in {
+            '1', 'true', 'ativo',
+        }
+        if not usuario_ativo or not check_password_hash(usuario['senha'], senha):
+            flash('Nome de usuário ou senha inválidos.', 'danger')
+            return _renderizar_login()
+
+        session.clear()
+        session['usuario_id'] = usuario['id']
+        session['usuario_nome'] = usuario['nome']
+        return redirect(url_for('index'))
+
+    return _renderizar_login()
+
+
+def _renderizar_login():
     with conexao() as conn:
-            if conn.execute('SELECT 1 FROM usuario WHERE nome = ?', (nome,)).fetchone():
-                flash('Já existe um usuário com esse nome.', 'danger')
-                return render_template('admin/login_usuario.html')
+        primeiro_acesso = conn.execute(
+            'SELECT 1 FROM usuario LIMIT 1'
+        ).fetchone() is None
+    return render_template(
+        'admin/login_usuario.html',
+        primeiro_acesso=primeiro_acesso,
+    )
 
-            conn.execute(
-                'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
-                (nome, generate_password_hash(senha), ativo),
-            )
-            conn.commit()
 
-    flash('Usuário cadastrado com sucesso.', 'success')
+@app.before_request
+def exigir_login():
+    endpoints_publicos = {
+        'static',
+        'inicio_publico',
+        'loginUsuario',
+        'catalogo',
+        'viewer_categoria',
+        'viewer_produto',
+        'orders.criar_pedido',
+    }
+    if request.endpoint == 'cadastrarUsuario' and 'usuario_id' not in session:
+        with conexao() as conn:
+            primeiro_acesso = conn.execute(
+                'SELECT 1 FROM usuario LIMIT 1'
+            ).fetchone() is None
+        if primeiro_acesso:
+            return None
 
-    return redirect(url_for('listar_usuario'))
-    return render_template('admin/login_usuario.html')
-    return render_template('admin/cadastrar_usuario.html')
+    if request.endpoint not in endpoints_publicos and 'usuario_id' not in session:
+        flash('Faça login para acessar essa página.', 'warning')
+        return redirect(url_for('loginUsuario'))
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    flash('Você saiu da sua conta.', 'success')
+    return redirect(url_for('loginUsuario'))
 
 @app.route('/cadastrar_usuario', methods=['GET', 'POST'])
 def cadastrarUsuario():
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()
-        senha = request.form.get('senha')
-        confirmar_senha = request.form.get('confirmar_senha')
-        ativo = request.form.get('ativo', 'False')
+        senha = request.form.get('senha', '')
+        confirmar_senha = request.form.get('confirmar_senha', '')
 
         if not nome or not senha:
             flash('Informe o nome e a senha do usuário.', 'danger')
@@ -99,19 +141,31 @@ def cadastrarUsuario():
 
             conn.execute(
                 'INSERT INTO usuario (nome, senha, ativo) VALUES (?, ?, ?)',
-                (nome, generate_password_hash(senha), ativo),
+                (nome, generate_password_hash(senha), 'True'),
             )
             conn.commit()
 
         flash('Usuário cadastrado com sucesso.', 'success')
 
-        return redirect(url_for('listarUsuarios'))
+        return redirect(url_for('loginUsuario'))
 
     return render_template('admin/cadastrar_usuario.html')
 
-@app.route('/')
+@app.route('/admin')
 def index():
-    return render_template('admin/index.html')
+    with conexao() as conn:
+        total_pedidos_novos = conn.execute(
+            "SELECT COUNT(*) FROM pedido WHERE status = 'novo'"
+        ).fetchone()[0]
+    return render_template(
+        'admin/index.html',
+        total_pedidos_novos=total_pedidos_novos,
+    )
+
+
+@app.route('/')
+def inicio_publico():
+    return redirect(url_for('viewer_categoria'))
 
 
 @app.route('/listar_categorias')
@@ -358,6 +412,7 @@ def viewer_categoria():
 
         if linha['produto_id'] is not None:
             categorias_por_id[categoria_id]['produtos'].append({
+                'id': linha['produto_id'],
                 'nome': linha['produto_nome'],
                 'preco': linha['produto_preco'],
                 'img': linha['produto_img'],
@@ -369,6 +424,7 @@ def viewer_categoria():
     )
 @app.route('/site/viewer_produto', methods=['GET'])
 def viewer_produto():
+
     return redirect(url_for('viewer_categoria'))
 
 @app.route('/listar_usuarios')

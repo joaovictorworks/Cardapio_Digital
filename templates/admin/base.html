@@ -42,7 +42,12 @@
       </ul>
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <span class="nav-link"><i class="bi bi-person-circle me-1"></i> Administrador</span>
+          <span class="nav-link"><i class="bi bi-person-circle me-1"></i> {{ session.get('usuario_nome', 'Usuário') }}</span>
+        </li>
+        <li class="nav-item">
+          <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit" class="btn btn-link nav-link">Sair</button>
+          </form>
         </li>
       </ul>
     </div>
@@ -77,6 +82,19 @@
                 <a href="{{ url_for('listarProduto') }}"
                    class="nav-link {% if request.endpoint == 'listarProduto' %}active{% endif %}">
                   <i class="nav-icon bi bi-box"></i><p>Produtos</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('orders.listar_pedidos') }}"
+                   class="nav-link {% if request.endpoint == 'orders.listar_pedidos' %}active{% endif %}">
+                  <i class="nav-icon bi bi-receipt"></i>
+                  <p>Pedidos <span id="novos-pedidos" class="badge text-bg-danger ms-1" hidden></span></p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('orders.qrcode_cardapio') }}"
+                   class="nav-link {% if request.endpoint == 'orders.qrcode_cardapio' %}active{% endif %}">
+                  <i class="nav-icon bi bi-qr-code"></i><p>QR Code do cardápio</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -138,6 +156,28 @@
       OverlayScrollbarsGlobal.OverlayScrollbars(wrapper, {
         scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true }
       });
+    }
+
+    const badge = document.getElementById('novos-pedidos');
+    if (badge) {
+      const atualizarPedidosNovos = async () => {
+        try {
+          const resposta = await fetch('{{ url_for("orders.contar_pedidos_novos") }}', {
+            headers: { Accept: 'application/json' }
+          });
+          if (!resposta.ok) {
+            throw new Error(`Falha ao consultar pedidos: ${resposta.status}`);
+          }
+          const dados = await resposta.json();
+          badge.textContent = dados.novos;
+          badge.hidden = dados.novos === 0;
+          badge.setAttribute('aria-label', `${dados.novos} pedidos novos`);
+        } catch (erro) {
+          console.error(erro);
+        }
+      };
+      atualizarPedidosNovos();
+      window.setInterval(atualizarPedidosNovos, 15000);
     }
   });
 </script>

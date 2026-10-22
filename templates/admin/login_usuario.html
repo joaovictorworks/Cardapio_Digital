@@ -73,15 +73,21 @@
         <div class="card-body login-card-body">
           <p class="login-box-msg">Entre com suas credenciais</p>
 
-          <form action="../index.html" method="post">
+          {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+              <div class="alert alert-{{ categoria }}" role="alert">{{ mensagem }}</div>
+            {% endfor %}
+          {% endwith %}
+
+          <form action="{{ url_for('loginUsuario') }}" method="post">
             <div class="input-group mb-3">
-              <input type="email" class="form-control" placeholder="Email" />
+              <input type="text" class="form-control" name="nome" placeholder="Nome de usuário" autocomplete="username" required />
               <div class="input-group-text">
-                <span class="bi bi-envelope"></span>
+                <span class="bi bi-person"></span>
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="password" class="form-control" placeholder="Password" />
+              <input type="password" class="form-control" name="senha" placeholder="Senha" autocomplete="current-password" required />
               <div class="input-group-text">
                 <span class="bi bi-lock-fill"></span>
               </div>
@@ -104,18 +110,12 @@
             </div>
             <!--end::Row-->
           </form>
-          <div class="social-auth-links text-center mb-3 d-grid gap-2">
-            <a href="#" class="btn btn-danger">
-              <i class="bi bi-google me-2"></i> login com Google
-            </a>
-          </div>
-          <!-- /.social-auth-links -->
-
-          <p class="mb-1">
-            <a href="forgot-password.html">Esqueceu sua senha?</a>
-          </p>
           <p class="mb-0">
-            <a href="cadastrar_usuario.html" class="text-center">Registrar um novo usuário</a>
+            {% if primeiro_acesso %}
+            <a href="{{ url_for('cadastrarUsuario') }}" class="text-center">
+              Criar a primeira conta administrativa
+            </a>
+            {% endif %}
           </p>
         </div>
         <!-- /.login-card-body -->
