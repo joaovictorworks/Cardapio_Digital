@@ -24,19 +24,3 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-  if (window.QRCode) {
-    new QRCode(document.getElementById('qrcode'), {
-      text: {{ catalogo_url|tojson }},
-      width: 240,
-      height: 240,
-      correctLevel: QRCode.CorrectLevel.H
-    });
-  } else {
-    document.getElementById('qrcode').textContent =
-      'Não foi possível carregar o gerador do QR Code. Use o link do cardápio acima.';
-  }
-</script>
-{% endblock %}
