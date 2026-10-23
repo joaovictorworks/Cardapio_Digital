@@ -92,15 +92,15 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('orders.qrcode_cardapio') }}"
-                   class="nav-link {% if request.endpoint == 'orders.qrcode_cardapio' %}active{% endif %}">
-                  <i class="nav-icon bi bi-qr-code"></i><p>QR Code do cardápio</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="{{ url_for('listarUsuarios') }}"
                    class="nav-link {% if request.endpoint == 'listarUsuarios' %}active{% endif %}">
                   <i class="nav-icon bi bi-person-circle"></i><p>Usuarios</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('orders.qrcode_cardapio') }}"
+                   class="nav-link {% if request.endpoint == 'orders.qrcode_cardapio' %}active{% endif %}">
+                  <i class="nav-icon bi bi-qr-code"></i><p>QR Code do cardápio</p>
                 </a>
               </li>
             </ul>

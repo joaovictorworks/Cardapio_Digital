@@ -1,0 +1,50 @@
+{% extends 'admin/base.html' %}
+{% block title %}Editar Usuário{% endblock %}
+{% block page_title %}Editar Usuários{% endblock %}
+{% block breadcrumb %}Editar Usuários{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-8 col-lg-10">
+    <div class="card card-warning card-outline">
+      <div class="card-header"><h3 class="card-title">Usuário #{{ usuario.id }}</h3></div>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Usuário</label>
+            <input type="text" class="form-control" id="nome" name="nome"
+                   value="{{ usuario.nome }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="senha" class="form-label">Senha</label>
+            <input type="password" class="form-control" id="senha" name="senha">
+          </div>
+          <div class="mb-3">
+            <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+            <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha">
+          </div>
+          <div class="mb-3">
+            <label for="ativo" class="form-label">Status</label>
+            <select class="form-select" id="ativo" name="ativo">
+              <option value="True" {% if usuario.ativo|string == 'True' %}selected{% endif %}>Ativo</option>
+              <option value="False" {% if usuario.ativo|string == 'False' %}selected{% endif %}>Inativo</option>
+            </select>
+          </div>
+
+          {% if usuario.img %}
+          <div class="mb-3">
+            <label class="form-label d-block">Imagem atual</label>
+            <img src="{{ url_for('static', filename=usuario.img) }}" alt="Imagem de {{ usuario.nome }}" class="image-preview">
+            <div class="form-text">Endereço salvo: {{ usuario.img }}</div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a href="{{ url_for('listarUsuarios') }}" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

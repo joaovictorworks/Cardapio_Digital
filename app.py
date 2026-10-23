@@ -478,7 +478,6 @@ def editarUsuario(id):
 
     return render_template('admin/editar_usuario.html', usuario=usuario)
 
-
 @app.route('/excluir_usuario/<int:id>', methods=['GET', 'POST'])
 def excluirUsuario(id):
     with conexao() as conn:
@@ -486,14 +485,14 @@ def excluirUsuario(id):
 
     if usuario is None:
         flash('Usuário não encontrado.', 'danger')
-        return redirect(url_for('listarUsuario'))
+        return redirect(url_for('listarUsuarios'))
 
     if request.method == 'POST':
         with conexao() as conn:
             conn.execute('DELETE FROM usuario WHERE id = ?', (id,))
             conn.commit()
         flash('Usuário excluído com sucesso.', 'success')
-        return redirect(url_for('listarUsuario'))
+        return redirect(url_for('listarUsuarios'))
 
     return render_template('admin/excluir_usuario.html', usuario=usuario)
 
