@@ -11,7 +11,7 @@
       <div class="card-body text-center">
         <p>Os clientes podem apontar a câmera do celular para este código e fazer o pedido.</p>
         <div id="qrcode" class="d-flex justify-content-center my-4"
-             role="img" aria-label="QR Code do cardápio"></div>
+             role="img" aria-label="QR Code do cardápio" data-url="{{ catalogo_url }}"></div>
         <a href="{{ catalogo_url }}" target="_blank" rel="noopener">{{ catalogo_url }}</a>
       </div>
       <div class="card-footer text-end">
@@ -24,3 +24,19 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  if (window.QRCode) {
+    new QRCode(document.getElementById('qrcode'), {
+      text: document.getElementById('qrcode').dataset.url,
+      width: 240,
+      height: 240,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  } else {
+    document.getElementById('qrcode').textContent =
+      'Não foi possível carregar o gerador do QR Code. Use o link do cardápio acima.';
+  }
+</script>
+{% endblock %}
