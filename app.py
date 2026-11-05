@@ -422,6 +422,7 @@ def viewer_categoria():
         'site/viewer_categoria.html',
         categorias=list(categorias_por_id.values()),
     )
+
 @app.route('/site/viewer_produto', methods=['GET'])
 def viewer_produto():
 

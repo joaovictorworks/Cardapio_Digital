@@ -13,7 +13,7 @@
       object-fit: cover;
     }
 
-    .category-card summary {
+    .category-card summary { 
       cursor: pointer;
       list-style: none;
       min-height: 5rem;
@@ -53,11 +53,18 @@
       </a>
     </div>
   </nav>
-  <main class="container py-4">
+  <div class="alert alert-{{ pedido_mensagem }}" role="alert">{{ mensagem }}</div>
+  <div class="alert alert-{{ categoria_mensagem }}" role="alert">{{ mensagem }}
+      </div>
+  <main class="container py-4" class="container py-4">
     <h1 class="mb-4">Nosso cardápio</h1>
     {% with mensagens = get_flashed_messages(with_categories=true) %}
       {% for categoria_mensagem, mensagem in mensagens %}
-      <div class="alert alert-{{ categoria_mensagem }}" role="alert">{{ mensagem }}</div>
+      <div class="alert alert-{{ categoria_mensagem }}" role="alert">{{ mensagem }}
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+      </div>
       {% endfor %}
     {% endwith %}
     <form action="{{ url_for('orders.criar_pedido') }}" method="post">
@@ -159,6 +166,11 @@
         <button class="btn btn-primary btn-lg" type="submit">
           Enviar pedido
         </button>
+      </div>
+      <div class="card-footer text-end">
+        <p class="mb-0 text-secondary">
+          Ao enviar o pedido, você concorda com o uso de seus dados para fins de processamento do pedido.
+        </p>
       </div>
     </section>
     </form>
