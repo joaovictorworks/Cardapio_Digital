@@ -53,10 +53,7 @@
       </a>
     </div>
   </nav>
-  <div class="alert alert-{{ pedido_mensagem }}" role="alert">{{ mensagem }}</div>
-  <div class="alert alert-{{ categoria_mensagem }}" role="alert">{{ mensagem }}
-      </div>
-  <main class="container py-4" class="container py-4">
+  <main class="container py-4">
     <h1 class="mb-4">Nosso cardápio</h1>
     {% with mensagens = get_flashed_messages(with_categories=true) %}
       {% for categoria_mensagem, mensagem in mensagens %}
@@ -174,6 +171,61 @@
       </div>
     </section>
     </form>
+    <section class="card mt-4" aria-labelledby="status-title">
+      <div class="card-header">
+        <h2 class="h5 mb-0" id="status-title">Acompanhe seu pedido</h2>
+      </div>
+      <div class="card-body">
+        <p id="status-pedido" class="mb-3" role="status" aria-live="polite">
+          Informe seu código de acompanhamento para consultar o pedido.
+        </p>
+        <form action="{{ url_for('orders.acompanhar_pedido') }}" method="post"
+              class="row g-2">
+          <div class="col">
+            <label class="visually-hidden" for="codigo-acompanhamento">
+              Código de acompanhamento
+            </label>
+            <input class="form-control" type="text" id="codigo-acompanhamento"
+                   name="token_acompanhamento" maxlength="128"
+                   placeholder="Código de acompanhamento" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-outline-primary" type="submit">
+              Acompanhar pedido
+            </button>
+          </div>
+        </form>
+        <small class="text-secondary">O status é atualizado automaticamente a cada 10 segundos.</small>
+      </div>
+    </section>
+    <script>
+      (() => {
+        const statusPedido = document.getElementById('status-pedido');
+        const urlStatus = {{ url_for('orders.consultar_status_cliente')|tojson }};
+
+        const atualizarStatus = async () => {
+          try {
+            const resposta = await fetch(urlStatus, {
+              headers: { Accept: 'application/json' }
+            });
+            if (!resposta.ok) {
+              throw new Error(`Falha ao consultar o pedido: ${resposta.status}`);
+            }
+            const dados = await resposta.json();
+            if (dados.acompanhamento) {
+              statusPedido.textContent =
+                `Pedido #${dados.pedido_id}: ${dados.status_texto} ` +
+                `(atualizado em ${dados.atualizado_em})`;
+            }
+          } catch (erro) {
+            console.error(erro);
+          }
+        };
+
+        atualizarStatus();
+        window.setInterval(atualizarStatus, 10000);
+      })();
+    </script>
   </main>
 </body>
 </html>

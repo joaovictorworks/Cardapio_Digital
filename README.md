@@ -37,10 +37,13 @@ funcionam apenas na própria máquina.
 2. O servidor valida disponibilidade e preço dos produtos e grava o pedido e
    seus itens numa transação SQLite, preservando nome/preço como fotografia do
    momento da compra.
-3. O painel administrativo lista os pedidos e permite atualizar o estado.
-   Um contador consulta novos pedidos a cada 15 segundos enquanto o painel está
+3. O cliente recebe um código secreto de acompanhamento após enviar o pedido.
+   Na página pública, o status é atualizado automaticamente a cada 10 segundos
+   enquanto ela estiver aberta.
+4. O painel administrativo lista os pedidos e permite atualizar o estado. Um
+   contador consulta novos pedidos a cada 15 segundos enquanto o painel está
    aberto.
-4. O administrador pode abrir/imprimir o QR Code para compartilhar o catálogo.
+5. O administrador pode abrir/imprimir o QR Code para compartilhar o catálogo.
 
 O pedido registra uma solicitação para o estabelecimento; pagamento e
 confirmação de entrega não fazem parte desta etapa.

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seu Verifica Status</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/dist/css/adminlte.min.css') }}">
+  <style>
+    .product-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .category-card summary { 
+      cursor: pointer;
+      list-style: none;
+      min-height: 5rem;
+    }
+
+    .category-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .category-card summary::after {
+      content: "+";
+      margin-left: auto;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .category-card[open] summary::after {
+      content: "−";
+    }
+
+    .category-image {
+      width: 3.5rem;
+      height: 3.5rem;
+      flex: 0 0 3.5rem;
+      object-fit: cover;
+      border-radius: .5rem;
+    }
+
+  </style>
+</head>
+<body>
+  <main class="container py-4" class="container py-4">
+    <h1 class="mb-4">Seu pedido</h1>
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% for categoria_mensagem, mensagem in mensagens %}
+      <div class="alert alert-{{ categoria_mensagem }}" role="alert">{{ mensagem }}
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+      </div>
+      {% endfor %}
+    {% endwith %}

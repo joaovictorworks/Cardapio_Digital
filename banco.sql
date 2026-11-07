@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     status TEXT NOT NULL DEFAULT 'novo'
         CHECK(status IN ('novo', 'aceito', 'preparando', 'pronto', 'concluido', 'cancelado')),
     total_centavos INTEGER NOT NULL CHECK(total_centavos >= 0),
+    token_acompanhamento TEXT,
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

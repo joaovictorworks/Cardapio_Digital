@@ -99,6 +99,8 @@ def exigir_login():
         'viewer_categoria',
         'viewer_produto',
         'orders.criar_pedido',
+        'orders.acompanhar_pedido',
+        'orders.consultar_status_cliente',
     }
     if request.endpoint == 'cadastrarUsuario' and 'usuario_id' not in session:
         with conexao() as conn:
@@ -162,11 +164,9 @@ def index():
         total_pedidos_novos=total_pedidos_novos,
     )
 
-
 @app.route('/')
 def inicio_publico():
     return redirect(url_for('viewer_categoria'))
-
 
 @app.route('/listar_categorias')
 def listarCategoria():

@@ -26,5 +26,19 @@ def inicializar_banco(caminho_banco):
     conexao = conectar(caminho_banco)
     try:
         conexao.executescript(caminho_schema.read_text(encoding='utf-8'))
+        colunas_pedido = {
+            coluna['name']
+            for coluna in conexao.execute('PRAGMA table_info(pedido)').fetchall()
+        }
+        if 'token_acompanhamento' not in colunas_pedido:
+            conexao.execute(
+                'ALTER TABLE pedido ADD COLUMN token_acompanhamento TEXT'
+            )
+        conexao.execute(
+            '''CREATE UNIQUE INDEX IF NOT EXISTS idx_pedido_token_acompanhamento
+               ON pedido(token_acompanhamento)
+               WHERE token_acompanhamento IS NOT NULL'''
+        )
+        conexao.commit()
     finally:
         conexao.close()
